@@ -1,0 +1,163 @@
+.vscode/
+
+### OSX ###
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemproraryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temprory Items
+.apdisk
+
+### Windows ###
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+#Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+#Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+### Eclipse ###
+
+.metadata
+bin/
+/tmp
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.setting/
+.loadpath
+.recommenders
+
+# Eclipse Core
+.project
+
+# External tool builders
+.externalToolBuilders/
+
+#Locally stored "Eclipse launch configurations"
+*.launch
+
+# PyDev specific
+*.pydevproject
+
+# CDT-specific
+.cproject
+
+# JDT-specific
+.classpath
+
+#Java annotation processor
+.factorypath
+
+# PDT-specific
+.buildpath
+
+# sbteclipse plugin
+.target
+
+# Tern plugin
+.tern-project
+
+# TeXlipse plugin
+.texlipse
+
+# STS
+.springBeans
+
+# Code Recommenders
+.recommenders/
+
+### Intellij ###
+*.iml
+.idea.
+
+.idea/workspace.xml
+.idea/tasks.xml
+.idea.dictionaries
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+
+# Gradle
+.idea/gradle.xml
+.idea/libraries
+
+.idea/mongoSetting.xml
+
+*.iws
+
+out/
+
+.idea_modules/
+
+atalssian-ide-plugin.xml
+
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+*.iml
+modules.xml
+.idea/misc.xml
+*.ipr
+
+
+### GIT ###
+*.orig
+
+### Gradle ###
+.gradle
+mortgage-path-message-svcAPI/build/
+
+gradle-app.setting
+!gradle-wrapper.jar
+
+.gradletasknamecache
+
+moduleArtifacts/
+
+*/**/gradle/
+
+volumes/
+
+*.hprof

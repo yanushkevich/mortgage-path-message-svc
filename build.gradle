@@ -1,0 +1,40 @@
+description = 'Promontory Mortgage Path Message Service'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+    }
+}
+
+apply plugin: 'eclipse'
+apply plugin: 'java'
+
+evaluationDependsOnChildren()
+
+configurations{
+    gen
+}
+
+jar.enabled = false
+
+dependencies {
+    gen 'org.apache.maven:maven-artifact:2.0.9'
+    gen 'org.apache.maven:maven-settings:2.0.9'
+    gen 'org.apache.maven:maven-model:2.0.9'
+    gen 'org.apache.maven:maven-repository-metadata:2.0.9'
+    implementation 'junit:junit:4.12'
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addBooleanOption('Xdoclint:none', true)
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}

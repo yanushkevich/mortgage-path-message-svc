@@ -1,0 +1,13 @@
+version: "2"
+services:
+  mortgage-path-message-svc:
+    build: .
+    ports:
+      - 8787:8787
+      - 8080:8080
+    environment:
+      RUNTIME_ENV: dev
+      ENVIRONMENT: dev
+    volumes:
+    - ./volumes/deployments/:/deployments
+    image: mortgage-path-message-svc-image

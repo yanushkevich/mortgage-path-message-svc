@@ -1,0 +1,185 @@
+description = 'Promontory Mortgage Path Message Service'
+
+buildscript {
+    ext {
+        springBootVersion = '2.1.4.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+        jcenter()
+
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+    }
+}
+apply plugin: 'java'
+apply plugin :'eclipse'
+
+apply plugin :'org.springframework.boot'
+apply plugin :'io.spring.dependency-management'
+
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
+eclipse {
+    classpath {
+        downloadSources = true
+    }
+}
+
+
+sourceSets {
+    intergationTest {
+        resources {
+            srcDirs file('src/integrationTest/java')
+            exclude '**/*.java'
+        }
+    }
+}
+
+test {
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}.doFirst {
+    environment "RUNTIME_ENV", "dev"
+    environment "ENVIRONMENT", "dev"
+
+    file("../env_files/dev_env.conf").readLines().each() {String line ->
+        if (!line.startsWith("#")) {
+            def (key, value) = line.tokenize('=')
+            if (key != null && value != null) {
+                key = key.replaceAll(/\s*export\s+/, '');
+                println "setting environment - [${key}]=[${value}]"
+                environment key, value
+            }
+        }
+    }
+}
+
+
+task buildInfo(type: org.springframework.boot.gradle.tasks.buildinfo.BuildInfo) {
+    destinationDir = file("$buildDir/buildInfo")
+    properties {
+        artifact = project.name.replaceAll('-api','')
+    }
+}
+
+
+springBoot {
+    mainClassName = 'com.promontory.message.service.assessment.MessageSvcSpringBootApplication'
+    buildInfo ()
+}
+
+if (!hasProperty('activeProfiles')) bootRun.ext.activeProfiles = 'dev'
+task classpathJar(type: Jar) {
+    dependsOn configurations.runtime
+    appendix = 'classpath'
+
+    doFirst {
+        manifest {
+            attributes 'Class-Path': configurations.runtime.files.collect {
+                it.toURI().toURL().toString().replaceFirst(/file:\/+/, '/').replaceAll(' ', '%20')
+            }.join(' ')
+        }
+    }
+}
+
+bootRun.ext.debugPort = 8787
+bootRun.ext.suspend = 'n'
+bootRun {
+    jvmArgs=[
+            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=${ext.suspend},address=${ext.debugPort}",
+            "-Dspring.profiles.active-${ext.activeProfiles}",
+            "-Xms1g"
+    ]
+    sourceResources sourceSets.main
+    dependsOn classpathJar
+}.doFirst{
+    environment "RUNTIME_ENV", "${ext.activeProfiles}"
+    environment "ENVIRONMENT", "${ext.activeProfiles}"
+    environment "HOSTNAME", "local"
+
+    file("../env_files/dev_env.conf").readLines().each() {String line ->
+        if (!line.startsWith("#")) {
+            def (key, value) = line.tokenize('=')
+            if (key != null && value != null) {
+                key = key.replaceAll(/\s*export\s+/, '');
+                println "setting environment - [${key}]=[${value}]"
+                environment key, value
+            }
+        }
+    }
+    classpath = files("$buildDir/classes/java/main", "$buildDir/resources/main", classpathJar.archivePath)
+}
+
+dependencies {
+    developmentOnly "org.springframework.boot:spring-boot-devtools"
+
+    compile 'ch.qos.logback:logback-core:1.2.3'
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'ch.qos.logback:logback-access:1.2.3'
+
+    compile 'net.logstash.logback:logstash-logback-encoder:5.1'
+
+    compile 'org.springframework.boot:spring-boot-starter'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-starter-aop'
+    compile 'org.springframework.boot:spring-boot-starter-jersey'
+
+    compileOnly 'org.projectlombok:lombok:1.18.8'
+    annotationProcessor 'org.projectlombok:lombok:1.18.8'
+
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.15'
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:3.+'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+task sourceJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourceJar
+    archives javadocJar
+}
+
+task cleanVolumes(type: Delete) {
+    delete fileTree(dir: "${rootProject.projectDir}/volumes/deployments")
+}
+
+task copyBootJar(type: Copy) {
+    from 'build/libs'
+    into "${rootProject.projectDir}/volumes/deployments"
+    exclude '*-javadoc.jar', '*-sources.jar'
+    rename '(.*)-api.*', '$1.jar'
+    fileMode = 0644
+}
+
+copyBootJar.dependsOn(cleanVolumes)
+
+build.finalizedBy(copyBootJar)
+
